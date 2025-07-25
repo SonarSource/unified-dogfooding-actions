@@ -93,6 +93,7 @@ runs:
           development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader username | ARTIFACTORY_USERNAME;
           development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | ARTIFACTORY_ACCESS_TOKEN;
           development/kv/data/repox artifactory_url | ARTIFACTORY_URL;
+          development/kv/data/slack token | SLACK_BOT_TOKEN;
 
     - name: Run IRIS
       shell: bash
