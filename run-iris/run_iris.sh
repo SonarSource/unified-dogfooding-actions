@@ -34,8 +34,8 @@ function get_dependency_risk_count() {
     count=0
   fi
 
-  echo "Found $count dependency risks"
-  return "$count"
+  echo "===== IRIS execution completed. Total dependency risks found: $count"
+  echo "total-count=$count" >> "$GITHUB_OUTPUT"
 }
 
 # Run IRIS from Next to SQC EU or SQC US
@@ -155,7 +155,3 @@ fi
 
 # Check for dependency risks after running IRIS
 get_dependency_risk_count
-TOTAL_COUNT=$?
-
-echo "===== IRIS execution completed. Total dependency risks found: $TOTAL_COUNT"
-echo "total-count=$TOTAL_COUNT" >> "$GITHUB_OUTPUT"
