@@ -4,6 +4,12 @@ A reusable GitHub composite action that runs SonarSource IRIS analysis tool to s
 
 ## Usage
 
+### Pre-requisite
+
+Before adding the run-iris step to your GH Actions workflow, be sure to first follow the steps in
+[Unified Platform Dogfooding](https://docs.google.com/document/d/1uYRuki3lQEfhbUbqHXXsyXZZViYVk5lSSuxXk22uz3g/edit?tab=t.0) to set up
+your Shadow Scans. This will only work once you have your projects created in the Shadow Platforms and scans running.
+
 ### External Repository Usage
 
 When using this action from another repository (e.g., if moved to a dedicated action repository):

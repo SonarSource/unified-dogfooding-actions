@@ -100,12 +100,7 @@ runs:
       continue-on-error: true
       run: |
         chmod +x ${{ github.action_path }}/run_iris.sh
-        set +e  # Temporarily disable exit on error
         ${{ github.action_path }}/run_iris.sh
-        EXIT_CODE=$?
-        set -e  # Re-enable exit on error
-        echo "exit-code=$EXIT_CODE" >> $GITHUB_OUTPUT
-        exit $EXIT_CODE
       env:
         PRIMARY_PROJECT_KEY: ${{ inputs.primary_project_key }}
         PRIMARY_PLATFORM: ${{ inputs.primary_platform }}
@@ -125,7 +120,7 @@ runs:
         ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
 
     - name: Notify Slack of Open Issues
-      if: steps.run-iris.outputs.exit-code != '0'
+      if: steps.run-iris.outputs.total-count != '0'
       uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
       env:
         SLACK_BOT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SLACK_BOT_TOKEN }}

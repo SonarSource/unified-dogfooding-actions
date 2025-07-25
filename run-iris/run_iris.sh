@@ -19,7 +19,7 @@ function get_dependency_risk_count() {
 
   response=$(curl -s \
     -H "Authorization: Bearer $SONAR_IRIS_NEXT_TOKEN" \
-    "$SONAR_NEXT_URL/api/v2/sca/issues-releases?projectKey=SonarSource_sonarcloud-codedatalake&riskStatuses=OPEN&severities=MEDIUM,HIGH,BLOCKER")
+    "$SONAR_NEXT_URL/api/v2/sca/issues-releases?projectKey=SonarSource_sonarcloud-codedatalake&riskStatuses=OPEN&severities=LOW,MEDIUM,HIGH,BLOCKER")
 
   if [ $? -ne 0 ]; then
     echo "Failed to fetch issues from API"
@@ -38,12 +38,15 @@ function get_dependency_risk_count() {
   return "$count"
 }
 
-# Run IRIS from Next to SQC
+# Run IRIS from Next to SQC EU or SQC US
 function run_iris_next_to_sqc () {
+  local destination_project_key=$1
+  local destination_platform=$2
+  local dryrun=$3
   local destination_url
   local destination_token
 
-  if [ "$2" = "SQC-EU" ]; then
+  if [ "$destination_platform" = "SQC-EU" ]; then
     destination_url="$SONAR_SQC_EU_URL"
     destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
   else
@@ -55,20 +58,23 @@ function run_iris_next_to_sqc () {
     -Diris.source.projectKey="$PRIMARY_PROJECT_KEY" \
     -Diris.source.url="$SONAR_NEXT_URL" \
     -Diris.source.token="$SONAR_IRIS_NEXT_TOKEN" \
-    -Diris.destination.projectKey="$1" \
+    -Diris.destination.projectKey="$destination_project_key" \
     -Diris.destination.organization="$ORGANIZATION" \
     -Diris.destination.url="$destination_url" \
     -Diris.destination.token="$destination_token" \
-    -Diris.dryrun="$3" \
+    -Diris.dryrun="$dryrun" \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
 }
 
-# Run IRIS from SQC to Next
+# Run IRIS from SQC EU to Next or SQC US
 function run_iris_sqc_to_next_or_sqc () {
+  local destination_project_key=$1
+  local destination_platform=$2
+  local dryrun=$3
   local destination_url
   local destination_token
 
-  if [ "$2" = "Next" ]; then
+  if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
     destination_token="$SONAR_IRIS_NEXT_TOKEN"
     organization=""
@@ -83,11 +89,11 @@ function run_iris_sqc_to_next_or_sqc () {
     -Diris.source.organization="$ORGANIZATION" \
     -Diris.source.url="$SONAR_SQC_EU_URL" \
     -Diris.source.token="$SONAR_IRIS_SQC_EU_TOKEN" \
-    -Diris.destination.projectKey="$1" \
+    -Diris.destination.projectKey="$destination_project_key" \
     -Diris.destination.organization="$organization" \
     -Diris.destination.url="$destination_url" \
     -Diris.destination.token="$destination_token" \
-    -Diris.dryrun="$3" \
+    -Diris.dryrun="$dryrun" \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
 }
 
@@ -152,4 +158,4 @@ get_dependency_risk_count
 TOTAL_COUNT=$?
 
 echo "===== IRIS execution completed. Total dependency risks found: $TOTAL_COUNT"
-exit $TOTAL_COUNT
+echo "total-count=$TOTAL_COUNT" >> "$GITHUB_OUTPUT"
