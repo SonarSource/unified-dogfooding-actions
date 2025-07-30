@@ -129,7 +129,7 @@ else
   if [ "$PRIMARY_PLATFORM" = "Next" ]; then
     run_iris_next_to_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
   else
-    run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "true"
+    run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
   fi
 fi
 
@@ -149,7 +149,7 @@ else
   if [ "$PRIMARY_PLATFORM" = "Next" ]; then
     run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
   else
-    run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "true"
+    run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
   fi
 fi
 
