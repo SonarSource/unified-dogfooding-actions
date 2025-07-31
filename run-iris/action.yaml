@@ -6,17 +6,23 @@ inputs:
     description: GitHub Environment
     required: false
     default: ManualDispatch
-  source_project_key:
-    description: Source project key
+  primary_project_key:
+    description: Project key of the primary platform
     required: true
-  source_organization:
-    description: Source organization name
+  primary_platform:
+    description: Platform of the primary platform (Next, SQC-EU, SQC-US)
     required: true
-  destination_project_key:
-    description: Destination project key
+  shadow1_project_key:
+    description: Project key of the first shadow platform
     required: true
-  destination_organization:
-    description: Destination organization name
+  shadow1_platform:
+    description: Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+    required: true
+  shadow2_project_key:
+    description: Project key of the second shadow platform
+    required: true
+  shadow2_platform:
+    description: Platform of the second shadow platform (Next, SQC-EU, SQC-US)
     required: true
   sonar_sqc_eu_url:
     description: SonarCloud EU URL
@@ -30,6 +36,10 @@ inputs:
     description: SonarQube Next URL
     required: false
     default: https://next.sonarqube.com/sonarqube
+  organization:
+    description: Organization name
+    required: false
+    default: sonarsource
 
 runs:
   using: composite
@@ -83,17 +93,22 @@ runs:
           development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader username | ARTIFACTORY_USERNAME;
           development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | ARTIFACTORY_ACCESS_TOKEN;
           development/kv/data/repox artifactory_url | ARTIFACTORY_URL;
+          development/kv/data/slack token | SLACK_BOT_TOKEN;
 
     - name: Run IRIS
       shell: bash
+      id: run-iris
       run: |
         chmod +x ${{ github.action_path }}/run_iris.sh
         ${{ github.action_path }}/run_iris.sh
       env:
-        SOURCE_PROJECT_KEY: ${{ inputs.source_project_key }}
-        SOURCE_ORGANIZATION: ${{ inputs.source_organization }}
-        DESTINATION_PROJECT_KEY: ${{ inputs.destination_project_key }}
-        DESTINATION_ORGANIZATION: ${{ inputs.destination_organization }}
+        PRIMARY_PROJECT_KEY: ${{ inputs.primary_project_key }}
+        PRIMARY_PLATFORM: ${{ inputs.primary_platform }}
+        SHADOW1_PROJECT_KEY: ${{ inputs.shadow1_project_key }}
+        SHADOW1_PLATFORM: ${{ inputs.shadow1_platform }}
+        SHADOW2_PROJECT_KEY: ${{ inputs.shadow2_project_key }}
+        SHADOW2_PLATFORM: ${{ inputs.shadow2_platform }}
+        ORGANIZATION: ${{ inputs.organization }}
         SONAR_SQC_EU_URL: ${{ inputs.sonar_sqc_eu_url }}
         SONAR_IRIS_SQC_EU_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_SQC_EU_TOKEN }}
         SONAR_SQC_US_URL: ${{ inputs.sonar_sqc_us_url }}
@@ -103,3 +118,12 @@ runs:
         ARTIFACTORY_USERNAME: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_USERNAME }}
         ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
         ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
+
+    - name: Notify Slack of Open Issues
+      if: steps.run-iris.outputs.total-count != '0'
+      uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
+      env:
+        SLACK_BOT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SLACK_BOT_TOKEN }}
+      with:
+        channel-id: alerts-ist-sca
+        slack-message: "IRIS has detected open issues in one or more shadow platforms. Please review the issues and resolve them."

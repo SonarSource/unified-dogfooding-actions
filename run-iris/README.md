@@ -4,18 +4,27 @@ A reusable GitHub composite action that runs SonarSource IRIS analysis tool to s
 
 ## Usage
 
+### Pre-requisite
+
+Before adding the run-iris step to your GH Actions workflow, be sure to first follow the steps in
+[Unified Platform Dogfooding](https://docs.google.com/document/d/1uYRuki3lQEfhbUbqHXXsyXZZViYVk5lSSuxXk22uz3g/edit?tab=t.0) to set up
+your Shadow Scans. This will only work once you have your projects created in the Shadow Platforms and scans running.
+
 ### External Repository Usage
 
 When using this action from another repository (e.g., if moved to a dedicated action repository):
 
 ```yaml
 - name: Run IRIS Analysis
-  uses: SonarSource/sonar-iris-action/.github/actions/run-iris@main
+  uses: SonarSource/unified-dogfooding-actions/run-iris@v1
   with:
-    source_project_key: "SonarSource_your-project-name"
-    source_organization: "sonarsource"
-    destination_project_key: "SonarSource_your-project-name"
-    destination_organization: "sonarsource"
+    primary_project_key: "SonarSource_your-project-name"
+    primary_platform: "Next" # Platform of the primary platform (Next, SQC-EU, SQC-US)
+    shadow1_project_key: "SonarSource_your-project-name"
+    shadow1_platform: "SQC-EU" # Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+    shadow2_project_key: "SonarSource_your-project-name"
+    shadow2_platform: "SQC-US" # Platform of the second shadow platform (Next, SQC-EU, SQC-US)
+    organization: "sonarsource" # Optional: Organization name
 ```
 
 ### Basic Usage
@@ -29,12 +38,15 @@ jobs:
       contents: read
     steps:
       - name: Run IRIS Analysis
-        uses: ./.github/actions/run-iris
+        uses: SonarSource/unified-dogfooding-actions/run-iris@v1
         with:
-          source_project_key: "SonarSource_your-project-name"
-          source_organization: "your-organization"
-          destination_project_key: "SonarSource_your-project-name"
-          destination_organization: "your-organization"
+          primary_project_key: "SonarSource_your-project-name"
+          primary_platform: "Next" # Platform of the primary platform (Next, SQC-EU, SQC-US)
+          shadow1_project_key: "SonarSource_your-project-name"
+          shadow1_platform: "SQC-EU" # Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+          shadow2_project_key: "SonarSource_your-project-name"
+          shadow2_platform: "SQC-US" # Platform of the second shadow platform (Next, SQC-EU, SQC-US)
+          organization: "your-organization" # Optional: Organization name
 ```
 
 ### Complete Workflow Example
@@ -70,12 +82,15 @@ jobs:
     runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_label || 'ubuntu-latest' }}
     steps:
       - name: Run IRIS Analysis
-        uses: ./.github/actions/run-iris
+        uses: SonarSource/unified-dogfooding-actions/run-iris@v1
         with:
-          source_project_key: "SonarSource_your-project-name"
-          source_organization: "your-organization"
-          destination_project_key: "SonarSource_your-project-name"
-          destination_organization: "your-organization"
+          primary_project_key: "SonarSource_your-project-name"
+          primary_platform: "Next" # Platform of the primary platform (Next, SQC-EU, SQC-US)
+          shadow1_project_key: "SonarSource_your-project-name"
+          shadow1_platform: "SQC-EU" # Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+          shadow2_project_key: "SonarSource_your-project-name"
+          shadow2_platform: "SQC-US" # Platform of the second shadow platform (Next, SQC-EU, SQC-US)
+          organization: "your-organization" # Optional: Organization name
           github_environment: ${{ github.event_name == 'workflow_dispatch' && inputs.github_environment || 'Scheduled' }}
 ```
 
@@ -85,16 +100,19 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `source_project_key` | Source project key | Yes | - |
-| `source_organization` | Source organization name | Yes | - |
-| `destination_project_key` | Destination project key | Yes | - |
-| `destination_organization` | Destination organization name | Yes | - |
+| `primary_project_key` | Project key of the primary platform | Yes | - |
+| `primary_platform` | Platform of the primary platform (Next, SQC-EU, SQC-US) | Yes | - |
+| `shadow1_project_key` | Project key of the first shadow platform | Yes | - |
+| `shadow1_platform` | Platform of the first shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
+| `shadow2_project_key` | Project key of the second shadow platform | Yes | - |
+| `shadow2_platform` | Platform of the second shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
 
 ### Optional Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `github_environment` | GitHub Environment | No | `ManualDispatch` |
+| `organization` | Organization name | No | `sonarsource` |
 | `sonar_sqc_eu_url` | SonarCloud EU URL | No | `https://sonarcloud.io` |
 | `sonar_sqc_us_url` | SonarCloud US URL | No | `https://sonarqube.us` |
 | `sonar_next_url` | SonarQube Next URL | No | `https://next.sonarqube.com/sonarqube` |
