@@ -52,12 +52,6 @@ runs:
         cache_key_prefix: mise-v1
         mise_toml: |
           [tools]
-          poetry = '1.8.5'
-          python = '3.13'
-          pipenv = '2024.4.0'
-          sops = '3.9.0'
-          "npm:aws-cdk" = "v2"
-          "npm:newman" = "latest"
           java = ['corretto-21', 'corretto-17']
       env:
         GITHUB_TOKEN: ${{ github.token }}
@@ -65,14 +59,6 @@ runs:
     - name: Print versions
       shell: bash
       run: |
-        echo "NPM: $(npm -v)"
-        echo "Python: $(python3 --version)"
-        echo "Pip: $(pip --version)"
-        echo "Pipenv: $(pipenv --version)"
-        echo "Poetry: $(poetry --version)"
-        echo "Node: $(node --version)"
-        echo "CDK: $(cdk --version)"
-        echo "Newman: $(newman --version)"
         echo "Default Java: $(java --version)"
         echo "All Java distributions installed: $(env | grep JAVA_)"
 
