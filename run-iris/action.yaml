@@ -98,9 +98,7 @@ runs:
     - name: Run IRIS
       shell: bash
       id: run-iris
-      run: |
-        chmod +x ${{ github.action_path }}/run_iris.sh
-        ${{ github.action_path }}/run_iris.sh
+      run: ${{ github.action_path }}/run_iris.sh
       env:
         PRIMARY_PROJECT_KEY: ${{ inputs.primary_project_key }}
         PRIMARY_PLATFORM: ${{ inputs.primary_platform }}
