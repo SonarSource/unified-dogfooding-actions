@@ -9,6 +9,7 @@ set -euo pipefail
 : "${SHADOW1_PROJECT_KEY?}" "${SHADOW1_PLATFORM?}"
 : "${SHADOW2_PROJECT_KEY?}" "${SHADOW2_PLATFORM?}"
 : "${ORGANIZATION?}"
+: "${STARTDATE?}"
 
 # Get dependency risk count
 function get_dependency_risk_count() {
@@ -38,6 +39,15 @@ function get_dependency_risk_count() {
   echo "total-count=$count" >> "$GITHUB_OUTPUT"
 }
 
+# Get startdate parameter if STARTDATE is defined
+function get_startdate_param() {
+  if [ -n "${STARTDATE:-}" ]; then
+    echo "-Diris.startdate=$STARTDATE"
+  else
+    echo ""
+  fi
+}
+
 # Run IRIS from Next to SQC EU or SQC US
 function run_iris_next_to_sqc () {
   local destination_project_key=$1
@@ -45,6 +55,7 @@ function run_iris_next_to_sqc () {
   local dryrun=$3
   local destination_url
   local destination_token
+  local startdate_param=$(get_startdate_param)
 
   if [ "$destination_platform" = "SQC-EU" ]; then
     destination_url="$SONAR_SQC_EU_URL"
@@ -63,6 +74,7 @@ function run_iris_next_to_sqc () {
     -Diris.destination.url="$destination_url" \
     -Diris.destination.token="$destination_token" \
     -Diris.dryrun="$dryrun" \
+    $startdate_param \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
 }
 
@@ -73,6 +85,7 @@ function run_iris_sqc_to_next_or_sqc () {
   local dryrun=$3
   local destination_url
   local destination_token
+  local startdate_param=$(get_startdate_param)
 
   if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
@@ -94,6 +107,7 @@ function run_iris_sqc_to_next_or_sqc () {
     -Diris.destination.url="$destination_url" \
     -Diris.destination.token="$destination_token" \
     -Diris.dryrun="$dryrun" \
+    $startdate_param \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
 }
 

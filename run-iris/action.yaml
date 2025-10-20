@@ -40,6 +40,10 @@ inputs:
     description: Organization name
     required: false
     default: sonarsource
+  startdate:
+    description: Start date for issue filtering (YYYY-MM-DD). Useful for batching issues requests when having more than the 10K issues limit.
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -93,6 +97,7 @@ runs:
         SONAR_IRIS_SQC_US_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_SQC_US_TOKEN }}
         SONAR_NEXT_URL: ${{ inputs.sonar_next_url }}
         SONAR_IRIS_NEXT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_NEXT_TOKEN }}
+        STARTDATE: ${{ inputs.startdate }}
         ARTIFACTORY_USERNAME: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_USERNAME }}
         ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
         ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}
