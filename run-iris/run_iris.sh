@@ -9,6 +9,7 @@ set -euo pipefail
 : "${SHADOW1_PROJECT_KEY?}" "${SHADOW1_PLATFORM?}"
 : "${SHADOW2_PROJECT_KEY?}" "${SHADOW2_PLATFORM?}"
 : "${ORGANIZATION?}"
+: "${SKIP_DRY_RUN?}"
 : "${STARTDATE?}"
 
 # Get dependency risk count
@@ -57,6 +58,11 @@ function run_iris_next_to_sqc () {
   local destination_token
   local startdate_param=$(get_startdate_param)
 
+  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
+    echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
+    return 0
+  fi
+
   if [ "$destination_platform" = "SQC-EU" ]; then
     destination_url="$SONAR_SQC_EU_URL"
     destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
@@ -86,6 +92,11 @@ function run_iris_sqc_to_next_or_sqc () {
   local destination_url
   local destination_token
   local startdate_param=$(get_startdate_param)
+
+  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
+    echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
+    return 0
+  fi
 
   if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
@@ -147,23 +158,27 @@ else
   fi
 fi
 
-
-echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW2_PLATFORM as dry-run"
-if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-  run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
+# Check if SHADOW2_PLATFORM is defined before running IRIS to SHADOW2
+if [ -z "${SHADOW2_PLATFORM:-}" ] || [ -z "${SHADOW2_PROJECT_KEY:-}" ]; then
+  echo "===== SHADOW2_PLATFORM or SHADOW2_PROJECT_KEY is not defined. Skipping IRIS execution to SHADOW2."
 else
-  run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
-fi
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
-  echo "===== Failed to run IRIS dry-run"
-  exit 1
-else
-  echo "===== Successful IRIS Next dry-run - executing IRIS for real."
+  echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW2_PLATFORM as dry-run"
   if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-    run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
   else
-    run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
+  fi
+  STATUS=$?
+  if [ $STATUS -ne 0 ]; then
+    echo "===== Failed to run IRIS dry-run"
+    exit 1
+  else
+    echo "===== Successful IRIS Next dry-run - executing IRIS for real."
+    if [ "$PRIMARY_PLATFORM" = "Next" ]; then
+      run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    else
+      run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    fi
   fi
 fi
 

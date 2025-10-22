@@ -49,6 +49,34 @@ jobs:
           organization: "your-organization" # Optional: Organization name
 ```
 
+### Usage with startdate
+
+```yaml
+- name: Run IRIS Analysis
+  uses: SonarSource/unified-dogfooding-actions/run-iris@v1
+  with:
+    primary_project_key: "SonarSource_your-project-name"
+    primary_platform: "Next" # Platform of the primary platform (Next, SQC-EU, SQC-US)
+    shadow1_project_key: "SonarSource_your-project-name"
+    shadow1_platform: "SQC-EU" # Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+    shadow2_project_key: "SonarSource_your-project-name"
+    shadow2_platform: "SQC-US" # Platform of the second shadow platform (Next, SQC-EU, SQC-US)
+    startdate: "2015-10-01" # Batch issues fetching month by month starting from this date
+    skip_dry_run: "true" # Optional: Skip dry run and perform actual changes directly
+```
+
+### Public mirror project issues sync
+
+```yaml
+- name: Sync public mirror project with IRIS
+  uses: SonarSource/unified-dogfooding-actions/run-iris@v1
+  with:
+    primary_project_key: "SonarSource_your-project-name-enterprise"
+    primary_platform: "Next" # Platform of the private project
+    shadow1_project_key: "SonarSource_your-project-name"
+    shadow1_platform: "Next" # Platform of the public mirror, can be the same as the primary platform
+```
+
 ### Complete Workflow Example
 
 ```yaml
@@ -63,16 +91,16 @@ permissions:
 
 on:
   schedule:
-    - cron: '20 */12 * * *'
+    - cron: "20 */12 * * *"
   workflow_dispatch:
     inputs:
       github_environment:
-        description: 'GitHub Environment'
+        description: "GitHub Environment"
         required: false
         type: string
         default: "ManualDispatch"
       runner_label:
-        description: 'GitHub Action runner'
+        description: "GitHub Action runner"
         required: false
         type: string
         default: "ubuntu-latest"
@@ -98,24 +126,26 @@ jobs:
 
 ### Required Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `primary_project_key` | Project key of the primary platform | Yes | - |
-| `primary_platform` | Platform of the primary platform (Next, SQC-EU, SQC-US) | Yes | - |
-| `shadow1_project_key` | Project key of the first shadow platform | Yes | - |
-| `shadow1_platform` | Platform of the first shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
-| `shadow2_project_key` | Project key of the second shadow platform | Yes | - |
-| `shadow2_platform` | Platform of the second shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
+| Input                 | Description                                                                                        | Required | Default |
+| --------------------- | -------------------------------------------------------------------------------------------------- | -------- | ------- |
+| `primary_project_key` | Project key of the primary platform                                                                | Yes      | -       |
+| `primary_platform`    | Platform of the primary platform (Next, SQC-EU, SQC-US)                                            | Yes      | -       |
+| `shadow1_project_key` | Project key of the first shadow platform                                                           | Yes      | -       |
+| `shadow1_platform`    | Platform of the first shadow platform (Next, SQC-EU, SQC-US)                                       | Yes      | -       |
+| `shadow2_project_key` | Project key of the second shadow platform, iris run is skipped if not provided                     | No       | -       |
+| `shadow2_platform`    | Platform of the second shadow platform (Next, SQC-EU, SQC-US), iris run is skipped if not provided | No       | -       |
 
 ### Optional Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `github_environment` | GitHub Environment | No | `ManualDispatch` |
-| `organization` | Organization name | No | `sonarsource` |
-| `sonar_sqc_eu_url` | SonarCloud EU URL | No | `https://sonarcloud.io` |
-| `sonar_sqc_us_url` | SonarCloud US URL | No | `https://sonarqube.us` |
-| `sonar_next_url` | SonarQube Next URL | No | `https://next.sonarqube.com/sonarqube` |
+| Input                | Description                                                                                                                 | Required | Default                                |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------- |
+| `github_environment` | GitHub Environment                                                                                                          | No       | `ManualDispatch`                       |
+| `organization`       | Organization name                                                                                                           | No       | `sonarsource`                          |
+| `sonar_sqc_eu_url`   | SonarCloud EU URL                                                                                                           | No       | `https://sonarcloud.io`                |
+| `sonar_sqc_us_url`   | SonarCloud US URL                                                                                                           | No       | `https://sonarqube.us`                 |
+| `sonar_next_url`     | SonarQube Next URL                                                                                                          | No       | `https://next.sonarqube.com/sonarqube` |
+| `skip_dry_run`       | Skip dry run and perform actual changes directly, recommended for use with startdate param which does a lot of queries      | No       | `false`                                |
+| `startdate`          | Start date for issue filtering (YYYY-MM-DD). Useful for batching issues requests when having more than the 10K issues limit | No       | ``                                     |
 
 ## Prerequisites
 
@@ -125,8 +155,8 @@ The workflow using this action must have the following permissions:
 
 ```yaml
 permissions:
-  id-token: write    # Required for vault authentication
-  contents: read     # Required for checkout
+  id-token: write # Required for vault authentication
+  contents: read # Required for checkout
 ```
 
 ### Required Secrets
