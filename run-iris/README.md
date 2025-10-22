@@ -49,6 +49,18 @@ jobs:
           organization: "your-organization" # Optional: Organization name
 ```
 
+### Public mirror project issues sync
+
+```yaml
+- name: Sync public mirror project with IRIS
+  uses: SonarSource/unified-dogfooding-actions/run-iris@v1
+  with:
+    primary_project_key: "SonarSource_your-project-name-enterprise"
+    primary_platform: "Next" # Platform of the private project
+    shadow1_project_key: "SonarSource_your-project-name"
+    shadow1_platform: "Next" # Platform of the public mirror, can be the same as the primary platform
+```
+
 ### Complete Workflow Example
 
 ```yaml
@@ -63,16 +75,16 @@ permissions:
 
 on:
   schedule:
-    - cron: '20 */12 * * *'
+    - cron: "20 */12 * * *"
   workflow_dispatch:
     inputs:
       github_environment:
-        description: 'GitHub Environment'
+        description: "GitHub Environment"
         required: false
         type: string
         default: "ManualDispatch"
       runner_label:
-        description: 'GitHub Action runner'
+        description: "GitHub Action runner"
         required: false
         type: string
         default: "ubuntu-latest"
@@ -98,14 +110,14 @@ jobs:
 
 ### Required Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `primary_project_key` | Project key of the primary platform | Yes | - |
-| `primary_platform` | Platform of the primary platform (Next, SQC-EU, SQC-US) | Yes | - |
-| `shadow1_project_key` | Project key of the first shadow platform | Yes | - |
-| `shadow1_platform` | Platform of the first shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
-| `shadow2_project_key` | Project key of the second shadow platform | Yes | - |
-| `shadow2_platform` | Platform of the second shadow platform (Next, SQC-EU, SQC-US) | Yes | - |
+| Input                 | Description                                                                                        | Required | Default |
+| --------------------- | -------------------------------------------------------------------------------------------------- | -------- | ------- |
+| `primary_project_key` | Project key of the primary platform                                                                | Yes      | -       |
+| `primary_platform`    | Platform of the primary platform (Next, SQC-EU, SQC-US)                                            | Yes      | -       |
+| `shadow1_project_key` | Project key of the first shadow platform                                                           | Yes      | -       |
+| `shadow1_platform`    | Platform of the first shadow platform (Next, SQC-EU, SQC-US)                                       | Yes      | -       |
+| `shadow2_project_key` | Project key of the second shadow platform, iris run is skipped if not provided                     | No       | -       |
+| `shadow2_platform`    | Platform of the second shadow platform (Next, SQC-EU, SQC-US), iris run is skipped if not provided | No       | -       |
 
 ### Optional Inputs
 
@@ -125,8 +137,8 @@ The workflow using this action must have the following permissions:
 
 ```yaml
 permissions:
-  id-token: write    # Required for vault authentication
-  contents: read     # Required for checkout
+  id-token: write # Required for vault authentication
+  contents: read # Required for checkout
 ```
 
 ### Required Secrets

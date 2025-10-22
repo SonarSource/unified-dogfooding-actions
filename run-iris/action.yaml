@@ -19,11 +19,11 @@ inputs:
     description: Platform of the first shadow platform (Next, SQC-EU, SQC-US)
     required: true
   shadow2_project_key:
-    description: Project key of the second shadow platform
-    required: true
+    description: Project key of the second shadow platform, iris run is skipped if not provided
+    required: false
   shadow2_platform:
-    description: Platform of the second shadow platform (Next, SQC-EU, SQC-US)
-    required: true
+    description: Platform of the second shadow platform (Next, SQC-EU, SQC-US), iris run is skipped if not provided
+    required: false
   sonar_sqc_eu_url:
     description: SonarCloud EU URL
     required: false

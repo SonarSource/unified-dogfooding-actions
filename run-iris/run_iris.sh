@@ -147,23 +147,27 @@ else
   fi
 fi
 
-
-echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW2_PLATFORM as dry-run"
-if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-  run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
+# Check if SHADOW2_PLATFORM is defined before running IRIS to SHADOW2
+if [ -z "${SHADOW2_PLATFORM:-}" ] || [ -z "${SHADOW2_PROJECT_KEY:-}" ]; then
+  echo "===== SHADOW2_PLATFORM or SHADOW2_PROJECT_KEY is not defined. Skipping IRIS execution to SHADOW2."
 else
-  run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
-fi
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
-  echo "===== Failed to run IRIS dry-run"
-  exit 1
-else
-  echo "===== Successful IRIS Next dry-run - executing IRIS for real."
+  echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW2_PLATFORM as dry-run"
   if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-    run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
   else
-    run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
+  fi
+  STATUS=$?
+  if [ $STATUS -ne 0 ]; then
+    echo "===== Failed to run IRIS dry-run"
+    exit 1
+  else
+    echo "===== Successful IRIS Next dry-run - executing IRIS for real."
+    if [ "$PRIMARY_PLATFORM" = "Next" ]; then
+      run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    else
+      run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
+    fi
   fi
 fi
 
