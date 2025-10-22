@@ -40,6 +40,10 @@ inputs:
     description: Organization name
     required: false
     default: sonarsource
+  skip_dry_run:
+    description: Skip dry run and perform actual changes directly, recommended for use with startdate param which does a lot of queries
+    required: false
+    default: 'false'
   startdate:
     description: Start date for issue filtering (YYYY-MM-DD). Useful for batching issues requests when having more than the 10K issues limit.
     required: false
@@ -98,6 +102,7 @@ runs:
         SONAR_NEXT_URL: ${{ inputs.sonar_next_url }}
         SONAR_IRIS_NEXT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_NEXT_TOKEN }}
         STARTDATE: ${{ inputs.startdate }}
+        SKIP_DRY_RUN: ${{ inputs.skip_dry_run }}
         ARTIFACTORY_USERNAME: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_USERNAME }}
         ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
         ARTIFACTORY_URL: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_URL }}

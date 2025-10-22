@@ -9,6 +9,7 @@ set -euo pipefail
 : "${SHADOW1_PROJECT_KEY?}" "${SHADOW1_PLATFORM?}"
 : "${SHADOW2_PROJECT_KEY?}" "${SHADOW2_PLATFORM?}"
 : "${ORGANIZATION?}"
+: "${SKIP_DRY_RUN?}"
 : "${STARTDATE?}"
 
 # Get dependency risk count
@@ -57,6 +58,11 @@ function run_iris_next_to_sqc () {
   local destination_token
   local startdate_param=$(get_startdate_param)
 
+  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
+    echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
+    return 0
+  fi
+
   if [ "$destination_platform" = "SQC-EU" ]; then
     destination_url="$SONAR_SQC_EU_URL"
     destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
@@ -86,6 +92,11 @@ function run_iris_sqc_to_next_or_sqc () {
   local destination_url
   local destination_token
   local startdate_param=$(get_startdate_param)
+
+  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
+    echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
+    return 0
+  fi
 
   if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
