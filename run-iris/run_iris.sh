@@ -79,7 +79,7 @@ function run_iris () {
   fi
 
   # Set destination attributes
-  if [ "$destination_plat" = "Next" ]; then
+  if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
     destination_token="$SONAR_IRIS_NEXT_TOKEN"
     destination_org=""
