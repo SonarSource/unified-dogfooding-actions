@@ -49,8 +49,7 @@ function get_startdate_param() {
   fi
 }
 
-# Run IRIS from Next to SQC EU or SQC US
-function run_iris_next_to_sqc () {
+function run_iris () {
   local destination_project_key=$1
   local destination_platform=$2
   local dryrun=$3
@@ -63,58 +62,45 @@ function run_iris_next_to_sqc () {
     return 0
   fi
 
-  if [ "$destination_platform" = "SQC-EU" ]; then
-    destination_url="$SONAR_SQC_EU_URL"
-    destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
+  # Set source attributes
+  if [ "$PRIMARY_PLATFORM" = "Next" ]; then
+    source_url="$SONAR_NEXT_URL"
+    source_token="$SONAR_IRIS_NEXT_TOKEN"
+    source_org=""
+  elif [ "$PRIMARY_PLATFORM" = "SQC-EU" ]; then
+    source_url="$SONAR_SQC_EU_URL"
+    source_token="$SONAR_IRIS_SQC_EU_TOKEN"
+    source_org="$ORGANIZATION"
   else
-    destination_url="$SONAR_SQC_US_URL"
-    destination_token="$SONAR_IRIS_SQC_US_TOKEN"
+    # SQC-US
+    source_url="$SONAR_SQC_US_URL"
+    source_token="$SONAR_IRIS_SQC_US_TOKEN"
+    source_org="$ORGANIZATION"
   fi
 
-  java \
-    -Diris.source.projectKey="$PRIMARY_PROJECT_KEY" \
-    -Diris.source.url="$SONAR_NEXT_URL" \
-    -Diris.source.token="$SONAR_IRIS_NEXT_TOKEN" \
-    -Diris.destination.projectKey="$destination_project_key" \
-    -Diris.destination.organization="$ORGANIZATION" \
-    -Diris.destination.url="$destination_url" \
-    -Diris.destination.token="$destination_token" \
-    -Diris.dryrun="$dryrun" \
-    $startdate_param \
-    -jar iris-\[RELEASE\]-jar-with-dependencies.jar
-}
-
-# Run IRIS from SQC EU to Next or SQC US
-function run_iris_sqc_to_next_or_sqc () {
-  local destination_project_key=$1
-  local destination_platform=$2
-  local dryrun=$3
-  local destination_url
-  local destination_token
-  local startdate_param=$(get_startdate_param)
-
-  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
-    echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
-    return 0
-  fi
-
+  # Set destination attributes
   if [ "$destination_platform" = "Next" ]; then
     destination_url="$SONAR_NEXT_URL"
     destination_token="$SONAR_IRIS_NEXT_TOKEN"
-    organization=""
+    destination_org=""
+  elif [ "$destination_platform" = "SQC-EU" ]; then
+    destination_url="$SONAR_SQC_EU_URL"
+    destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
+    destination_org="$ORGANIZATION"
   else
+    # SQC-US
     destination_url="$SONAR_SQC_US_URL"
     destination_token="$SONAR_IRIS_SQC_US_TOKEN"
-    organization="$ORGANIZATION"
+    destination_org="$ORGANIZATION"
   fi
 
   java \
     -Diris.source.projectKey="$PRIMARY_PROJECT_KEY" \
-    -Diris.source.organization="$ORGANIZATION" \
-    -Diris.source.url="$SONAR_SQC_EU_URL" \
-    -Diris.source.token="$SONAR_IRIS_SQC_EU_TOKEN" \
+    -Diris.source.organization="$source_org" \
+    -Diris.source.url="$source_url" \
+    -Diris.source.token="$source_token" \
     -Diris.destination.projectKey="$destination_project_key" \
-    -Diris.destination.organization="$organization" \
+    -Diris.destination.organization="$destination_org" \
     -Diris.destination.url="$destination_url" \
     -Diris.destination.token="$destination_token" \
     -Diris.dryrun="$dryrun" \
@@ -140,22 +126,14 @@ else
 fi
 
 echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW1_PLATFORM as dry-run"
-if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-  run_iris_next_to_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "true"
-else
-  run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "true"
-fi
+run_iris $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "true"
 STATUS=$?
 if [ $STATUS -ne 0 ]; then
   echo "===== Failed to run IRIS dry-run"
   exit 1
 else
   echo "===== Successful IRIS Next dry-run - executing IRIS for real."
-  if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-    run_iris_next_to_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
-  else
-    run_iris_sqc_to_next_or_sqc $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
-  fi
+  run_iris $SHADOW1_PROJECT_KEY $SHADOW1_PLATFORM "false"
 fi
 
 # Check if SHADOW2_PLATFORM is defined before running IRIS to SHADOW2
@@ -163,22 +141,14 @@ if [ -z "${SHADOW2_PLATFORM:-}" ] || [ -z "${SHADOW2_PROJECT_KEY:-}" ]; then
   echo "===== SHADOW2_PLATFORM or SHADOW2_PROJECT_KEY is not defined. Skipping IRIS execution to SHADOW2."
 else
   echo "===== Execute IRIS $PRIMARY_PLATFORM to $SHADOW2_PLATFORM as dry-run"
-  if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-    run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
-  else
-    run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
-  fi
+  run_iris $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "true"
   STATUS=$?
   if [ $STATUS -ne 0 ]; then
     echo "===== Failed to run IRIS dry-run"
     exit 1
   else
     echo "===== Successful IRIS Next dry-run - executing IRIS for real."
-    if [ "$PRIMARY_PLATFORM" = "Next" ]; then
-      run_iris_next_to_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
-    else
-      run_iris_sqc_to_next_or_sqc $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
-    fi
+    run_iris $SHADOW2_PROJECT_KEY $SHADOW2_PLATFORM "false"
   fi
 fi
 
