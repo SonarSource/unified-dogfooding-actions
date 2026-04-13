@@ -7,14 +7,14 @@ on:
 jobs:
   PullRequestMerged_job:
     name: Pull Request Merged
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs-public
     permissions:
       id-token: write
       pull-requests: read
     # For external PR, ticket should be moved manually
     if: |
-        github.event.pull_request.head.repo.full_name == github.repository
-        && github.event.pull_request.merged
+      github.event.pull_request.head.repo.full_name == github.repository
+      && github.event.pull_request.merged
     steps:
       - id: secrets
         uses: SonarSource/vault-action-wrapper@v3
