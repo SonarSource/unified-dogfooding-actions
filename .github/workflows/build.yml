@@ -1,0 +1,39 @@
+---
+
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      skip_dry_run:
+        description: "Skip dry-run and run IRIS directly (use with caution)"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  # The pre-commit job runs YAML linting and other hooks on pull requests.
+  # It is defined in pre-commit.yml and runs automatically on every PR.
+
+  test-run-iris:
+    name: Test run-iris action
+    runs-on: sonar-xs-public
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Run IRIS Analysis (local action)
+        uses: ./run-iris
+        with:
+          primary_project_key: "org.sonarsource.java:java"
+          primary_platform: "Next"
+          shadow1_project_key: "org.sonarsource.java:java"
+          shadow1_platform: "SQC-EU"
+          shadow2_project_key: "org.sonarsource.java:java"
+          shadow2_platform: "SQC-US"
+          skip_dry_run: ${{ inputs.skip_dry_run || 'false' }}
