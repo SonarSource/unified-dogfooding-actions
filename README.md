@@ -27,3 +27,7 @@ Hooks run automatically on every commit. To run them manually:
 ```sh
 pre-commit run --all-files
 ```
+
+## Release
+
+See [release](https://github.com/SonarSource/ci-github-actions/#release).
