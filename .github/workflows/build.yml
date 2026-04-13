@@ -3,6 +3,7 @@
 name: Build
 
 on:
+  pull_request:
   push:
     branches:
       - master
@@ -15,11 +16,8 @@ on:
         default: false
 
 jobs:
-  # The pre-commit job runs YAML linting and other hooks on pull requests.
-  # It is defined in pre-commit.yml and runs automatically on every PR.
-
-  test-run-iris:
-    name: Test run-iris action
+  run-iris:
+    name: Run IRIS Analysis
     runs-on: sonar-xs-public
     permissions:
       id-token: write
@@ -30,10 +28,9 @@ jobs:
       - name: Run IRIS Analysis (local action)
         uses: ./run-iris
         with:
-          primary_project_key: "org.sonarsource.java:java"
-          primary_platform: "Next"
-          shadow1_project_key: "org.sonarsource.java:java"
-          shadow1_platform: "SQC-EU"
-          shadow2_project_key: "org.sonarsource.java:java"
+          primary_project_key: "SonarSource_sonar-dummy"
+          primary_platform: "SQC-EU"
+          shadow1_project_key: "SonarSource_sonar-dummy"
+          shadow1_platform: "Next"
+          shadow2_project_key: "SonarSource_sonar-dummy"
           shadow2_platform: "SQC-US"
-          skip_dry_run: ${{ inputs.skip_dry_run || 'false' }}

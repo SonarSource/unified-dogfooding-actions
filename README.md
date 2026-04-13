@@ -1,6 +1,7 @@
 # unified-dogfooding-actions
 
-Reusable GitHub Actions for [Unified Platform Dogfooding](https://docs.google.com/document/d/1uYRuki3lQEfhbUbqHXXsyXZZViYVk5lSSuxXk22uz3g/) at SonarSource.
+Reusable GitHub Actions for [Unified Platform Dogfooding](https://docs.google.com/document/d/1uYRuki3lQEfhbUbqHXXsyXZZViYVk5lSSuxXk22uz3g/)
+at SonarSource.
 
 Maintained by the **Platform Engineering Experience squad** (`@sonarsource/platform-eng-xp-squad`).
 
@@ -8,7 +9,8 @@ Maintained by the **Platform Engineering Experience squad** (`@sonarsource/platf
 
 ### [`run-iris`](./run-iris/README.md)
 
-Runs the [IRIS](https://github.com/SonarSource/iris) analysis tool to synchronize issues between SonarQube instances (Next, SQC-EU, SQC-US). See the [run-iris README](./run-iris/README.md) for usage details and examples.
+Runs the [IRIS](https://github.com/SonarSource/iris) analysis tool to synchronize issues between SonarQube instances (Next, SQC-EU, SQC-US).
+See the [run-iris README](./run-iris/README.md) for usage details and examples.
 
 ## Development
 
@@ -25,7 +27,3 @@ Hooks run automatically on every commit. To run them manually:
 ```sh
 pre-commit run --all-files
 ```
-
-### Releasing
-
-See [RELEASING.md](./RELEASING.md) for instructions on how to release a new version and update the `v*` branches.
