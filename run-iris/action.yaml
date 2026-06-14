@@ -109,9 +109,10 @@ runs:
 
     - name: Notify Slack of Open Issues
       if: steps.run-iris.outputs.total-count != '0'
-      uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
-      env:
-        SLACK_BOT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SLACK_BOT_TOKEN }}
+      uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
       with:
-        channel-id: alerts-ist-sca
-        slack-message: "IRIS has detected open issues in one or more shadow platforms. Please review the issues and resolve them."
+        method: chat.postMessage
+        token: ${{ fromJSON(steps.secrets.outputs.vault).SLACK_BOT_TOKEN }}
+        payload: |
+          channel: "alerts-ist-sca"
+          text: "IRIS has detected open issues in one or more shadow platforms. Please review the issues and resolve them."
