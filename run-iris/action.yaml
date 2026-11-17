@@ -54,11 +54,10 @@ runs:
   steps:
     - name: Mise setup
       id: mise-setup
-      uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      uses: SonarSource/mise-action-wrapper@c2a44f2676ca98598415a83c5a4649e6a45a225a # 1.0.3
       with:
-        cache_save: true
-        cache_key_prefix: mise-v1
-        mise_toml: |
+        cache-key-prefix: mise-v1
+        mise-toml: |
           [tools]
           java = ['corretto-21', 'corretto-17']
       env:
