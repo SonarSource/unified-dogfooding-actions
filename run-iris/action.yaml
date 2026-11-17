@@ -54,7 +54,7 @@ runs:
   steps:
     - name: Mise setup
       id: mise-setup
-      uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+      uses: step-security/mise-action@c7396e2a2a4ad1ea43abee3317d964292da354ae # v4.0.1
       with:
         cache_save: true
         cache_key_prefix: mise-v1
