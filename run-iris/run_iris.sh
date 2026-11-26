@@ -57,17 +57,17 @@ function run_iris () {
   local destination_token
   local startdate_param=$(get_startdate_param)
 
-  if [ "$SKIP_DRY_RUN" = "true" ] && [ "$dryrun" = "true" ]; then
+  if [[ "$SKIP_DRY_RUN" = "true" ]] && [[ "$dryrun" = "true" ]]; then
     echo "===== SKIP_DRY_RUN is true, skipping dry-run execution"
     return 0
   fi
 
   # Set source attributes
-  if [ "$PRIMARY_PLATFORM" = "Next" ]; then
+  if [[ "$PRIMARY_PLATFORM" = "Next" ]]; then
     source_url="$SONAR_NEXT_URL"
     source_token="$SONAR_IRIS_NEXT_TOKEN"
     source_org=""
-  elif [ "$PRIMARY_PLATFORM" = "SQC-EU" ]; then
+  elif [[ "$PRIMARY_PLATFORM" = "SQC-EU" ]]; then
     source_url="$SONAR_SQC_EU_URL"
     source_token="$SONAR_IRIS_SQC_EU_TOKEN"
     source_org="$ORGANIZATION"
@@ -79,11 +79,11 @@ function run_iris () {
   fi
 
   # Set destination attributes
-  if [ "$destination_platform" = "Next" ]; then
+  if [[ "$destination_platform" = "Next" ]]; then
     destination_url="$SONAR_NEXT_URL"
     destination_token="$SONAR_IRIS_NEXT_TOKEN"
     destination_org=""
-  elif [ "$destination_platform" = "SQC-EU" ]; then
+  elif [[ "$destination_platform" = "SQC-EU" ]]; then
     destination_url="$SONAR_SQC_EU_URL"
     destination_token="$SONAR_IRIS_SQC_EU_TOKEN"
     destination_org="$ORGANIZATION"
